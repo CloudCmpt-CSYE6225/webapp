@@ -61,7 +61,7 @@ app.get('/healthz', async (req, res) => {
   }
 });
 
-// Handle unsupported methods for /healthz
+// Handle unsupported methods for /healthz like post put delete
 app.all('/healthz', (req, res) => {
   res.set({
     'Cache-Control': 'no-cache, no-store, must-revalidate',
