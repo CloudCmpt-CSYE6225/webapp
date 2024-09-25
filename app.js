@@ -30,7 +30,13 @@ const sequelize = new Sequelize(
 app.get('/healthz', async (req, res) => {
   // Check for payload
   if (Object.keys(req.query).length > 0 || Object.keys(req.body).length > 0) {
-    return res.status(400).end();
+    res.writeHead(400, {
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'X-Content-Type-Options': 'nosniff',
+      'Content-Length': '0'
+    });
+    return res.end();
   }
 
   try {
@@ -38,26 +44,22 @@ app.get('/healthz', async (req, res) => {
     await sequelize.authenticate();
 
     // Set headers
-    res.set({
+    res.writeHead(200, {
       'Cache-Control': 'no-cache, no-store, must-revalidate',
       'Pragma': 'no-cache',
-      'X-Content-Type-Options': 'nosniff'
+      'X-Content-Type-Options': 'nosniff',
+      'Content-Length': '0'
     });
-    
-    // Return 200 OK with no payload
-    res.status(200).end();
+    return res.end();
   } catch (error) {
     console.error('Unable to connect to the database:', error);
-    
-    // Set headers
-    res.set({
+    res.writeHead(503, {
       'Cache-Control': 'no-cache, no-store, must-revalidate',
       'Pragma': 'no-cache',
-      'X-Content-Type-Options': 'nosniff'
+      'X-Content-Type-Options': 'nosniff',
+      'Content-Length': '0'
     });
-    
-    // Return 503 Service Unavailable with no payload
-    res.status(503).end();
+    return res.end();
   }
 });
 
@@ -66,9 +68,12 @@ app.all('/healthz', (req, res) => {
   res.set({
     'Cache-Control': 'no-cache, no-store, must-revalidate',
     'Pragma': 'no-cache',
-    'X-Content-Type-Options': 'nosniff'
+    'X-Content-Type-Options': 'nosniff',
   });
-  res.status(405).end();
+  res.writeHead(405, {
+    'Content-Length': '0'
+  });
+  res.end();
 });
 
 // Start the server
