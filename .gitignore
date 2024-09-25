@@ -133,3 +133,4 @@ dist
 node_modules
 dist
 .sass-cache
+.env
