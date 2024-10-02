@@ -19,8 +19,12 @@
     ```
 
 3. **DB connection**:
-    - **Create .env file and add db connection values
+    - **Create .env file and add db connection values**
 
 4. **Run the application**:
     ```bash
-    npm run dev
+    dev: npm run dev
+    test: npm run test
+    ```
+
+## Digital Ocean setup commands
