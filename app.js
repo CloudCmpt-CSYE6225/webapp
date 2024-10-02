@@ -1,3 +1,4 @@
+//This file is deprecated and not used in the project. Same is split in different folders and can be run from index.js
 
 import express, { json } from 'express';
 import { config } from 'dotenv';
@@ -15,6 +16,16 @@ const app = express();
 // Middleware
 app.use(json());
 app.use(express.json());
+
+// Middleware to remove cache-related headers from all responses
+app.use((req, res, next) => {
+  res.set({
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+    'Pragma': 'no-cache',
+    'X-Content-Type-Options': 'nosniff'
+  });
+  next();
+});
 
 // Handle unsupported methods for /healthz like post put delete
 app.all('/healthz', (req, res, next) => {
@@ -35,36 +46,18 @@ app.all('/healthz', (req, res, next) => {
 app.get('/healthz', async (req, res) => {
   // Check for payload
   if (Object.keys(req.query).length > 0 || Object.keys(req.body).length > 0) {
-    res.writeHead(400, {
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-      'Pragma': 'no-cache',
-      'X-Content-Type-Options': 'nosniff',
-      'Content-Length': '0'
-    });
-    return res.end();
+    
+    return res.status(400).end();
   }
 
   try {
     // Test database connection
     await sequelize.authenticate();
 
-    // Set headers
-    res.writeHead(200, {
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-      'Pragma': 'no-cache',
-      'X-Content-Type-Options': 'nosniff',
-      'Content-Length': '0'
-    });
-    return res.end();
+    return res.status(200).end();
   } catch (error) {
     console.error('Unable to connect to the database:', error);
-    res.writeHead(503, {
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-      'Pragma': 'no-cache',
-      'X-Content-Type-Options': 'nosniff',
-      'Content-Length': '0'
-    });
-    return res.end();
+    return res.status(503).end();
   }
 });
 
@@ -117,11 +110,6 @@ app.post('/v1/user', async (req, res) => {
 app.all('/v1/user/self', (req, res, next) => {
   const unsupportedMethods = ['HEAD', 'POST','OPTIONS', 'PATCH', 'DELETE'];
   if (unsupportedMethods.includes(req.method)) {
-    res.set({
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-      'Pragma': 'no-cache',
-      'X-Content-Type-Options': 'nosniff',
-    });
     res.status(405).end();
   } else {
     next();
@@ -214,7 +202,9 @@ async function bootstrapDatabase() {
     console.log('Database synchronized');
   } catch (error) {
     console.error('Error bootstrapping database:', error);
-  }
+  } 
 }
 
 bootstrapDatabase();
+
+export default app;
