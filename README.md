@@ -19,8 +19,24 @@
     ```
 
 3. **DB connection**:
-    - **Create .env file and add db connection values
+    - **Create .env file and add db connection values**
 
 4. **Run the application**:
     ```bash
+    dev: npm run dev
+    test: npm run test
+    ```
+
+## Digital Ocean setup commands
+    ```bash
+    apt install zip npm mysql-server
+    scp -i ~<ssh identity filepath> <zip file path> root@ip:/tmp
+    mysql_secure_installation
+    sudo mysql
+    CREATE DATABASE webapp;
+    create new user and grant privileges
+    Add env variables
+    npm i
     npm run dev
+    To start/stop sql : sudo service mysql stop
+    ```
