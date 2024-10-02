@@ -1,6 +1,6 @@
 import request from 'supertest';
-import app from '../app.js';
-import sequelize from '../config/database.js';
+import app from '../index.js';
+import sequelize from '../app/config/database.js';
 
 let server;
 
