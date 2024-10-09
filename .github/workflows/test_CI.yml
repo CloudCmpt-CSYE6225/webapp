@@ -36,7 +36,7 @@ jobs:
     - name: Setup MySQL
       run: |
         sudo service mysql start
-        mysql -h ${{secrets.MYSQL_HOST}} --port 3306 -u${{secrets.MYSQL_USER}} -p${{secrets.MYSQL_PASSWORD}} -e "CREATE DATABASE IF NOT EXISTS ${{ secrets.MYSQL_DATABASE }};"
+        mysql -h ${{secrets.MYSQL_HOST}} --port=3306 -u${{secrets.MYSQL_USER}} -p${{secrets.MYSQL_PASSWORD}} -e "CREATE DATABASE IF NOT EXISTS ${{ secrets.MYSQL_DATABASE }};"
 
     - name: Install Dependencies
       run: npm ci
@@ -46,4 +46,4 @@ jobs:
 
     - name: Drop DB
       if: always()
-      run: mysql -h ${{secrets.MYSQL_HOST}} --port 3306 -u${{secrets.MYSQL_USER}} -p${{secrets.MYSQL_PASSWORD}} -e "DROP DATABASE IF EXISTS ${{ secrets.MYSQL_DATABASE }};"
+      run: mysql -h ${{secrets.MYSQL_HOST}} --port=3306 -u${{secrets.MYSQL_USER}} -p${{secrets.MYSQL_PASSWORD}} -e "DROP DATABASE IF EXISTS ${{ secrets.MYSQL_DATABASE }};"
