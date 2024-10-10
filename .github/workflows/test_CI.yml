@@ -30,11 +30,6 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
 
-    - name: Install MySQL
-      run: |
-        sudo apt update
-        sudo apt install -y mysql-server
-
     - name: Setup MySQL
       run: |
         sudo /etc/init.d/mysql start
