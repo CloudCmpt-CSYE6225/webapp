@@ -5,8 +5,15 @@ import sequelize from '../app/config/database.js';
 let server;
 
 beforeAll(async () => {
-  server = app.listen(); 
-});
+  try {
+    await sequelize.sync({ force: true });
+    console.log('Database synchronized');
+    server = app.listen();
+  } catch (error) {
+    console.error('Setup failed:', error);
+    throw error;
+  }
+}, 30000);
 
 // Unit Tests for User Creation Endpoint
 
