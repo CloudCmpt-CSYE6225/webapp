@@ -12,10 +12,10 @@ jobs:
     environment: test
 
     env:
-      MYSQL_USER: ${{ secrets.MYSQL_USER }}
-      MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-      MYSQL_HOST: ${{ secrets.MYSQL_HOST }}
-      MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+      MYSQL_USER: ${{ secrets.DB_USER }}
+      MYSQL_PASSWORD: ${{ secrets.DB_PASS }}
+      MYSQL_HOST: ${{ secrets.DB_HOST }}
+      MYSQL_DATABASE: ${{ secrets.DB_DATABASE }}
 
     strategy:
       matrix:
@@ -37,14 +37,14 @@ jobs:
     - name: Setup MySQL
       run: |
         sudo /etc/init.d/mysql start
-        mysql -h ${{secrets.MYSQL_HOST}} -u${{secrets.MYSQL_USER}} -p${{secrets.MYSQL_PASSWORD}} -e "CREATE DATABASE ${{ secrets.MYSQL_DATABASE }};"
+        mysql -h ${{secrets.DB_HOST}} -u${{secrets.DB_USER}} -p${{secrets.DB_PASS}} -e "CREATE DATABASE ${{ secrets.DB_DATABASE }};"
 
     - name: Install Dependencies
       run: npm ci
 
     - name: Run Integration Tests
-      run: npm test
+      run: npm test -- --detectOpenHandles --verbose --forceExit
 
     - name: Drop DB
       if: always()
-      run: mysql -h ${{secrets.MYSQL_HOST}} -u ${{ secrets.MYSQL_USER }} -p${{ secrets.MYSQL_PASSWORD }} -e "DROP DATABASE IF EXISTS ${{ secrets.MYSQL_DATABASE }};"
+      run: mysql -h ${{secrets.DB_HOST}} -u ${{ secrets.DB_USER }} -p${{ secrets.DB_PASS }} -e "DROP DATABASE IF EXISTS ${{ secrets.DB_DATABASE }};"
