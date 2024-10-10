@@ -12,10 +12,11 @@ jobs:
     environment: test
 
     env:
-      MYSQL_USER: ${{ secrets.DB_USER }}
-      MYSQL_PASSWORD: ${{ secrets.DB_PASS }}
-      MYSQL_HOST: ${{ secrets.DB_HOST }}
-      MYSQL_DATABASE: ${{ secrets.DB_DATABASE }}
+      DB_USER: ${{ secrets.DB_USER }}
+      DB_PASS: ${{ secrets.DB_PASS }}
+      DB_HOST: ${{ secrets.DB_HOST }}
+      DB_DATABASE: ${{ secrets.DB_DATABASE }}
+      PORT: ${{ secrets.PORT }}
 
     strategy:
       matrix:
