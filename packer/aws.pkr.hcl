@@ -44,6 +44,7 @@ variable "subnet_id" {
 
 variable "demo_account_id" {
   type = string
+  default = "913524908663"
 }
 
 source "amazon-ebs" "ubuntu" {
