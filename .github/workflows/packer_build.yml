@@ -73,11 +73,25 @@ jobs:
         uses: hashicorp/setup-packer@main
         with:
           version: '1.10.0'
+
+      - name: Set script permissions
+        run: chmod +x packer/scripts/*.sh
   
       - name: Build custom AMI
+        env:
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASS: ${{ secrets.DB_PASS }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_DATABASE: ${{ secrets.DB_DATABASE }}
+          PORT: ${{ secrets.PORT }}
         run: |
-            packer init .
-            packer build \
-              -var "aws_region=${{ env.AWS_REGION }}" \
-              -var "demo_account_id=${{ secrets.DEMO_ACCOUNT_ID }}" \
-              aws.pkr.hcl
+          cd packer
+          packer build -debug \
+            -var "aws_region=${{ env.AWS_REGION }}" \
+            -var "demo_account_id=${{ secrets.DEMO_ACCOUNT_ID }}" \
+            -var "db_user=${DB_USER}" \
+            -var "db_pass=${DB_PASS}" \
+            -var "db_host=${DB_HOST}" \
+            -var "db_name=${DB_DATABASE}" \
+            -var "app_port=${PORT}" \
+            aws.pkr.hcl
