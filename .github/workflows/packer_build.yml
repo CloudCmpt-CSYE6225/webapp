@@ -63,11 +63,11 @@ jobs:
       - name: Build application artifact
         run: |
           npm run build
-          mkdir -p artifact
-          cp -r dist/* artifact/
-          cp package.json artifact/
-          cp package-lock.json artifact/
-          zip -r webapp-artifact.zip artifact/
+          # mkdir -p artifact
+          # cp -r dist/* artifact/
+          # cp package.json artifact/
+          # cp package-lock.json artifact/
+          # zip -r webapp-artifact.zip artifact/
 
       - name: Setup Packer
         uses: hashicorp/setup-packer@main
@@ -78,20 +78,9 @@ jobs:
         run: chmod +x packer/scripts/*.sh
   
       - name: Build custom AMI
-        env:
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PASS: ${{ secrets.DB_PASS }}
-          DB_HOST: ${{ secrets.DB_HOST }}
-          DB_DATABASE: ${{ secrets.DB_DATABASE }}
-          PORT: ${{ secrets.PORT }}
         run: |
           cd packer
           packer build -debug \
             -var "aws_region=${{ env.AWS_REGION }}" \
             -var "demo_account_id=${{ secrets.DEMO_ACCOUNT_ID }}" \
-            -var "db_user=${DB_USER}" \
-            -var "db_pass=${DB_PASS}" \
-            -var "db_host=${DB_HOST}" \
-            -var "db_name=${DB_DATABASE}" \
-            -var "app_port=${PORT}" \
             aws.pkr.hcl
