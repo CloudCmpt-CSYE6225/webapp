@@ -42,6 +42,10 @@ variable "subnet_id" {
   default = "subnet-00b9d631e15246aac" # subnet ID in my default VPC
 }
 
+variable "demo_account_id" {
+  type = string
+}
+
 source "amazon-ebs" "ubuntu" {
   ami_name      = "${var.app_name}-${formatdate("YYYY-MM-DD-hh-mm-ss", timestamp())}"
   instance_type = var.instance_type
@@ -51,6 +55,7 @@ source "amazon-ebs" "ubuntu" {
   vpc_id        = var.vpc_id
   subnet_id     = var.subnet_id
 
+  ami_users = [var.demo_account_id]
   tags = {
     Name = "${var.app_name}-${formatdate("YYYY-MM-DD", timestamp())}"
   }
@@ -66,11 +71,16 @@ source "amazon-ebs" "ubuntu" {
 build {
   sources = ["source.amazon-ebs.ubuntu"]
 
+  provisioner "file" {
+    source      = "scripts/"
+    destination = "/tmp/scripts/"
+  }
   provisioner "shell" {
     inline = [
       "sudo mkdir -p /opt/app/",
       "sudo chown -R ubuntu:ubuntu /opt/app",
       "sudo chmod -R 755 /opt/app",
+      "sudo chmod +x /tmp/scripts/*.sh",
     ]
   }
 
@@ -80,26 +90,35 @@ build {
   }
 
   provisioner "shell" {
-    script = "scripts/install_dependencies.sh"
+    pause_before = "10s"
+    timeout      = "10m"
+    script       = "/tmp/scripts/install_dependencies.sh"
   }
 
   provisioner "shell" {
-    script = "scripts/setup_mysql.sh"
+    script = "/tmp/scripts/setup_mysql.sh"
   }
 
   provisioner "shell" {
-    script = "scripts/create_webapp_user.sh"
+    script = "/tmp/scripts/create_webapp_user.sh"
   }
 
   provisioner "shell" {
-    script = "scripts/setup_application.sh"
+    script = "/tmp/scripts/setup_application.sh"
   }
 
   provisioner "shell" {
-    script = "scripts/setup_systemd_service.sh"
+    script = "/tmp/scripts/setup_systemd_service.sh"
+    environment_vars = [
+      "DB_HOST=${var.db_host}",
+      "DB_USER=${var.db_user}",
+      "DB_PASS=${var.db_pass}",
+      "DB_DATABASE=${var.db_database}",
+      "PORT=${var.port}"
+    ]
   }
 
   provisioner "shell" {
-    script = "scripts/cleanup.sh"
+    script = "/tmp/scripts/cleanup.sh"
   }
 }

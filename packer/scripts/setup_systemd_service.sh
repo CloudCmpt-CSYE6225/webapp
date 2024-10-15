@@ -8,8 +8,8 @@ After=network.target
 
 [Service]
 User=csye6225
-WorkingDirectory=/opt/app/webapp
-ExecStart=/usr/bin/node /opt/app/webapp/index.js
+WorkingDirectory=/opt/app/artifact
+ExecStart=/usr/bin/node /opt/app/artifact/dist/index.js
 Restart=always
 
 [Install]
