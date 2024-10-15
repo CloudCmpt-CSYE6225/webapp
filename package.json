@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "build": "node index.js"
   },
   "author": "",
   "license": "ISC",
