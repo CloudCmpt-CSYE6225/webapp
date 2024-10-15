@@ -43,8 +43,13 @@ variable "subnet_id" {
 }
 
 variable "demo_account_id" {
-  type = string
+  type    = string
   default = "913524908663"
+}
+
+variable "artifact_path" {
+  type    = string
+  default = "../webapp-artifact.zip"
 }
 
 source "amazon-ebs" "ubuntu" {
@@ -72,54 +77,47 @@ source "amazon-ebs" "ubuntu" {
 build {
   sources = ["source.amazon-ebs.ubuntu"]
 
-  provisioner "file" {
-    source      = "scripts/"
-    destination = "/tmp/scripts/"
-  }
+  # provisioner "file" {
+  #   source      = "./packer/scripts/"
+  #   destination = "/tmp/scripts/"
+  # }
   provisioner "shell" {
     inline = [
       "sudo mkdir -p /opt/app/",
       "sudo chown -R ubuntu:ubuntu /opt/app",
       "sudo chmod -R 755 /opt/app",
-      "sudo chmod +x /tmp/scripts/*.sh",
+      # "sudo chmod +x /tmp/scripts/*.sh",
     ]
   }
 
   provisioner "file" {
-    source      = "webapp-artifact.zip"
+    source      = var.artifact_path != "" ? var.artifact_path : null
     destination = "/opt/app/webapp-artifact.zip"
   }
 
   provisioner "shell" {
     pause_before = "10s"
     timeout      = "10m"
-    script       = "/tmp/scripts/install_dependencies.sh"
+    script       = "packer/scripts/install_dependencies.sh"
   }
 
   provisioner "shell" {
-    script = "/tmp/scripts/setup_mysql.sh"
+    script = "packer/scripts/setup_mysql.sh"
   }
 
   provisioner "shell" {
-    script = "/tmp/scripts/create_webapp_user.sh"
+    script = "packer/scripts/create_webapp_user.sh"
   }
 
   provisioner "shell" {
-    script = "/tmp/scripts/setup_application.sh"
+    script = "packer/scripts/setup_application.sh"
   }
 
   provisioner "shell" {
-    script = "/tmp/scripts/setup_systemd_service.sh"
-    environment_vars = [
-      "DB_HOST=${var.db_host}",
-      "DB_USER=${var.db_user}",
-      "DB_PASS=${var.db_pass}",
-      "DB_DATABASE=${var.db_database}",
-      "PORT=${var.port}"
-    ]
+    script = "packer/scripts/setup_systemd_service.sh"
   }
 
   provisioner "shell" {
-    script = "/tmp/scripts/cleanup.sh"
+    script = "packer/scripts/cleanup.sh"
   }
 }
