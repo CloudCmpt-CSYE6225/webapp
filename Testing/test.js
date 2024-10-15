@@ -49,7 +49,7 @@ describe('User Creation Endpoint', () => {
         email: 'srijith.makam@abc.com',
         password: '12345',
         first_name: 'Srijith',
-        last_name: 'Makam'
+        last_name: 'Makam'bmsdbkfj
       });
 
     expect(res.status).toEqual(400);
