@@ -17,9 +17,6 @@ fi
 echo "Unzipping application artifact..."
 sudo unzip -o webapp-artifact.zip -d .
 
-echo "Removing packer directory if it exists..."
-sudo rm -rf packer
-
 echo "Setting correct ownership..."
 sudo chown -R csye6225:csye6225 .
 
