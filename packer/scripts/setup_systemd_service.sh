@@ -1,20 +1,25 @@
 #!/bin/bash
 set -e
 
-cat << EOF | sudo tee /etc/systemd/system/csye6225.service
+# Create systemd service file
+cat << EOF | sudo tee /etc/systemd/system/webapp.service
 [Unit]
-Description=CSYE6225 Web Application
+Description=Web Application
 After=network.target
 
 [Service]
+Type=simple
 User=csye6225
-WorkingDirectory=/opt/app/artifact
-ExecStart=/usr/bin/node /opt/app/artifact/dist/index.js
-Restart=always
+WorkingDirectory=/opt/app
+ExecStart=/usr/bin/node /opt/app/index.js
+Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
 EOF
 
+# Reload systemd
 sudo systemctl daemon-reload
-sudo systemctl enable csye6225.service
+
+# Enable the service
+sudo systemctl enable webapp.service
