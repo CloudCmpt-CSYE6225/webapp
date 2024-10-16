@@ -38,7 +38,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+          # cache: 'npm'
 
       - name: Setup MySQL
         run: |
@@ -80,6 +80,7 @@ jobs:
       - name: Build custom AMI
         run: |
           cd packer
+          packer init .
           packer build -debug \
             -var "aws_region=${{ env.AWS_REGION }}" \
             -var "demo_account_id=${{ secrets.DEMO_ACCOUNT_ID }}" \
