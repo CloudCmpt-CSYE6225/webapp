@@ -52,6 +52,12 @@ variable "artifact_path" {
   default = "../webapp-artifact.zip"
 }
 
+variable "MYSQL_PASSWORD" {}
+variable "MYSQL_DATABASENAME" {}
+variable "MYSQL_USERNAME" {}
+variable "MYSQL_HOSTNAME" {}
+variable "PORT" {}
+
 source "amazon-ebs" "ubuntu" {
   ami_name      = "${var.app_name}-${formatdate("YYYY-MM-DD-hh-mm-ss", timestamp())}"
   instance_type = var.instance_type
@@ -109,7 +115,15 @@ build {
   }
 
   provisioner "shell" {
+    environment_vars = [
+      "DB_PASS=${var.MYSQL_PASSWORD}",
+      "DB_DATABASE=${var.MYSQL_DATABASENAME}",
+      "DB_USER=${var.MYSQL_USERNAME}",
+      "DB_HOST=${var.MYSQL_HOSTNAME}",
+      "PORT=${var.PORT}",
+    ]
     script = "scripts/setup_systemd_service.sh"
+
   }
 
   provisioner "shell" {

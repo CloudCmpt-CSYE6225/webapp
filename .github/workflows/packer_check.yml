@@ -30,7 +30,12 @@ jobs:
       - name: Packer validate
         run: |
           cd packer/
-          packer validate -var "artifact_path=" aws.pkr.hcl
+          packer validate -var "artifact_path=" \
+            -var "MYSQL_PASSWORD=${{secrets.DB_PASS}}" \
+            -var "MYSQL_DATABASENAME=${{secrets.DB_DATABASE}}" \
+            -var "MYSQL_USERNAME=${{secrets.DB_USER}}" \
+            -var "MYSQL_HOSTNAME=${{secrets.DB_HOST}}"\
+            -var "PORT=${{secrets.PORT}}" aws.pkr.hcl 
           if [ $? -ne 0 ]; then
             echo "Packer template validation failed. Please check the template for errors."
             exit 1
