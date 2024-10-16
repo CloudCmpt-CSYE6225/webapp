@@ -20,6 +20,21 @@ sudo unzip -o webapp-artifact.zip -d .
 echo "Setting correct ownership..."
 sudo chown -R csye6225:csye6225 .
 
+echo "Creating .env file..."
+cat << EOF > .env
+DB_HOST=${MYSQL_HOSTNAME}
+DB_USER=${MYSQL_USERNAME}
+DB_PASSWORD=${MYSQL_PASSWORD}
+DB_NAME=${MYSQL_DATABASENAME}
+PORT=${PORT}
+EOF
+echo ".env file created"
+
+echo "Setting correct permissions for .env file..."
+sudo chown csye6225:csye6225 .env
+sudo chmod 600 .env
+echo ".env file permissions set"
+
 echo "Installing dependencies..."
 sudo -u csye6225 npm install
 
