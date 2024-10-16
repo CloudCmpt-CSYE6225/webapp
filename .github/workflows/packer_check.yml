@@ -29,7 +29,8 @@ jobs:
 
       - name: Packer validate
         run: |
-          packer validate -var "artifact_path=" packer/aws.pkr.hcl
+          cd packer/
+          packer validate -var "artifact_path=" aws.pkr.hcl
           if [ $? -ne 0 ]; then
             echo "Packer template validation failed. Please check the template for errors."
             exit 1
