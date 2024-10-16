@@ -13,7 +13,7 @@ User=csye6225
 Group=csye6225
 EnvironmentFile=/opt/app/.env
 WorkingDirectory=/opt/app
-ExecStart=/usr/bin/node index.js
+ExecStart=/usr/bin/node /opt/app/index.js
 Restart=on-failure
 TimeoutStartSec=60
 

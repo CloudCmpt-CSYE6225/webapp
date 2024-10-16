@@ -111,6 +111,13 @@ build {
   }
 
   provisioner "shell" {
+    environment_vars = [
+      "DB_PASS=${var.MYSQL_PASSWORD}",
+      "DB_DATABASE=${var.MYSQL_DATABASENAME}",
+      "DB_USER=${var.MYSQL_USERNAME}",
+      "DB_HOST=${var.MYSQL_HOSTNAME}",
+      "PORT=${var.PORT}",
+    ]
     script = "scripts/setup_application.sh"
   }
 
