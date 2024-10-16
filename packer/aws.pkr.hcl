@@ -49,7 +49,7 @@ variable "demo_account_id" {
 
 variable "artifact_path" {
   type    = string
-  default = "webapp-artifact.zip"
+  default = "../webapp-artifact.zip"
 }
 
 source "amazon-ebs" "ubuntu" {
@@ -77,16 +77,11 @@ source "amazon-ebs" "ubuntu" {
 build {
   sources = ["source.amazon-ebs.ubuntu"]
 
-  # provisioner "file" {
-  #   source      = "./packer/scripts/"
-  #   destination = "/tmp/scripts/"
-  # }
   provisioner "shell" {
     inline = [
       "sudo mkdir -p /opt/app/",
       "sudo chown -R ubuntu:ubuntu /opt/app",
       "sudo chmod -R 755 /opt/app",
-      # "sudo chmod +x /tmp/scripts/*.sh",
     ]
   }
 
@@ -98,26 +93,26 @@ build {
   provisioner "shell" {
     pause_before = "10s"
     timeout      = "10m"
-    script       = "packer/scripts/install_dependencies.sh"
+    script       = "scripts/install_dependencies.sh"
   }
 
   provisioner "shell" {
-    script = "packer/scripts/setup_mysql.sh"
+    script = "scripts/setup_mysql.sh"
   }
 
   provisioner "shell" {
-    script = "packer/scripts/create_webapp_user.sh"
+    script = "scripts/create_webapp_user.sh"
   }
 
   provisioner "shell" {
-    script = "packer/scripts/setup_application.sh"
+    script = "scripts/setup_application.sh"
   }
 
   provisioner "shell" {
-    script = "packer/scripts/setup_systemd_service.sh"
+    script = "scripts/setup_systemd_service.sh"
   }
 
   provisioner "shell" {
-    script = "packer/scripts/cleanup.sh"
+    script = "scripts/cleanup.sh"
   }
 }
