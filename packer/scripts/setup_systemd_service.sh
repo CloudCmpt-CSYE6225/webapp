@@ -13,6 +13,7 @@ User=csye6225
 WorkingDirectory=/opt/app
 ExecStart=/usr/bin/node /opt/app/index.js
 Restart=on-failure
+TimeoutStartSec=60
 
 [Install]
 WantedBy=multi-user.target
@@ -23,3 +24,9 @@ sudo systemctl daemon-reload
 
 # Enable the service
 sudo systemctl enable webapp.service
+
+# Start the service
+sudo systemctl start webapp.service
+
+# Check the status
+sudo systemctl status webapp.service
