@@ -21,14 +21,17 @@ echo "Setting correct ownership..."
 sudo chown -R csye6225:csye6225 .
 
 echo "Creating .env file..."
-cat << EOF > .env
+sudo bash -c 'cat << EOF > /opt/app/.env
 DB_HOST=${MYSQL_HOSTNAME}
 DB_USER=${MYSQL_USERNAME}
 DB_PASSWORD=${MYSQL_PASSWORD}
 DB_NAME=${MYSQL_DATABASENAME}
 PORT=${PORT}
-EOF
+EOF'
 echo ".env file created"
+if sudo touch /opt/app/.env; then
+  echo "Successfully created .env file"
+fi
 
 echo "Setting correct permissions for .env file..."
 sudo chown csye6225:csye6225 .env
