@@ -53,23 +53,23 @@ variable "artifact_path" {
 }
 
 variable "DB_DATABASE" {
-  type    = string
+  type = string
 }
 
 variable "DB_USER" {
-  type    = string
+  type = string
 }
 
 variable "DB_HOST" {
-  type    = string
+  type = string
 }
 
 variable "PORT" {
-  type    = string
+  type = string
 }
 
 variable "DB_PASS" {
-  type    = string
+  type = string
 }
 
 source "amazon-ebs" "ubuntu" {
