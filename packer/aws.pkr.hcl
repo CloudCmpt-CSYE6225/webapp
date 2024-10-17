@@ -53,24 +53,30 @@ variable "artifact_path" {
 }
 
 variable "DB_DATABASE" {
-  type = string
+  type    = string
+  default = "{{ env `DB_DATABASE` }}"
 }
 
 variable "DB_USER" {
-  type = string
-}
-
-variable "DB_HOST" {
-  type = string
-}
-
-variable "PORT" {
-  type = string
+  type    = string
+  default = "{{ env `DB_USER` }}"
 }
 
 variable "DB_PASS" {
-  type = string
+  type    = string
+  default = "{{ env `DB_PASS` }}"
 }
+
+variable "DB_HOST" {
+  type    = string
+  default = "{{ env `DB_HOST` }}"
+}
+
+variable "PORT" {
+  type    = string
+  default = "{{ env `PORT` }}"
+}
+
 
 source "amazon-ebs" "ubuntu" {
   ami_name      = "${var.app_name}-${formatdate("YYYY-MM-DD-hh-mm-ss", timestamp())}"
