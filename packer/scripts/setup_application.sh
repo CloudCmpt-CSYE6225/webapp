@@ -20,23 +20,21 @@ sudo unzip -o webapp-artifact.zip -d .
 echo "Setting correct ownership..."
 sudo chown -R csye6225:csye6225 .
 
-echo "Creating .env file..."
-sudo bash -c 'cat << EOF > /opt/app/.env
+# Check if .env file exists
+if [ ! -f /opt/app/.env ]; then
+    echo "Creating .env file..."
+    sudo bash -c 'cat << EOF > /opt/app/.env
 DB_HOST=${DB_HOST}
 DB_USER=${DB_USER}
 DB_PASS=${DB_PASS}
 DB_DATABASE=${DB_DATABASE}
 PORT=${PORT}
 EOF'
-echo ".env file created"
-if sudo touch /opt/app/.env; then
-  echo "Successfully created .env file"
+    echo ".env file created"
+else
+    echo ".env file already exists, skipping creation."
 fi
-echo "Debug: DB_HOST=${DB_HOST}"
-echo "Debug: DB_USER=${DB_USER}"
-echo "Debug: DB_PASS=${DB_PASS}"
-echo "Debug: DB_DATABASE=${DB_DATABASE}"
-echo "Debug: PORT=${PORT}"
+
 echo "Setting correct permissions for .env file..."
 sudo chown csye6225:csye6225 .env
 sudo chmod 644 .env
