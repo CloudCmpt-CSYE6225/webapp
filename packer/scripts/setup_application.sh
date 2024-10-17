@@ -21,7 +21,7 @@ echo "Setting correct ownership..."
 sudo chown -R csye6225:csye6225 .
 
 # Check if .env file exists
-if [ ! -f /opt/app/.env ]; then
+if [ ! -f .env ]; then
     echo "Creating .env file..."
     sudo bash -c 'cat << EOF > /opt/app/.env
 DB_HOST=${DB_HOST}
