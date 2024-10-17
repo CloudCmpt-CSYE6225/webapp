@@ -40,3 +40,5 @@
     npm run dev
     To start/stop sql : sudo service mysql stop
     ```
+
+## Packer check and packer build workflows added, running packer build workflow creates AMI
