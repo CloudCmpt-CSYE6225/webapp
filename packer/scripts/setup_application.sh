@@ -39,7 +39,7 @@ echo "Debug: DB_DATABASE=${DB_DATABASE}"
 echo "Debug: PORT=${PORT}"
 echo "Setting correct permissions for .env file..."
 sudo chown csye6225:csye6225 .env
-sudo chmod 600 .env
+sudo chmod 644 .env
 echo ".env file permissions set"
 
 echo "Installing dependencies..."
