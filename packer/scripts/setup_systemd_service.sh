@@ -13,11 +13,9 @@ User=csye6225
 Group=csye6225
 EnvironmentFile=/opt/app/.env
 WorkingDirectory=/opt/app
-ExecStartPre=/bin/bash -c "while [ ! -f /opt/finish.txt ]; do sleep 1; done"
 ExecStart=/usr/bin/node /opt/app/index.js
 Restart=on-failure
-RestartSec=3
-
+TimeoutStartSec=60
 
 [Install]
 WantedBy=multi-user.target
