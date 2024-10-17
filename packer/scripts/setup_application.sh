@@ -22,10 +22,10 @@ sudo chown -R csye6225:csye6225 .
 
 echo "Creating .env file..."
 sudo bash -c 'cat << EOF > /opt/app/.env
-DB_HOST=${MYSQL_HOSTNAME}
-DB_USER=${MYSQL_USERNAME}
-DB_PASSWORD=${MYSQL_PASSWORD}
-DB_NAME=${MYSQL_DATABASENAME}
+DB_HOST=${DB_HOST}
+DB_USER=${DB_USER}
+DB_PASSWORD=${DB_PASSWORD}
+DB_NAME=${DB_NAME}
 PORT=${PORT}
 EOF'
 echo ".env file created"
