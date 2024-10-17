@@ -63,11 +63,6 @@ jobs:
       - name: Build application artifact
         run: |
           npm run build
-          # mkdir -p artifact
-          # cp -r dist/* artifact/
-          # cp package.json artifact/
-          # cp package-lock.json artifact/
-          # zip -r webapp-artifact.zip artifact/
 
       - name: Setup Packer
         uses: hashicorp/setup-packer@main
