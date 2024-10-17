@@ -24,8 +24,8 @@ echo "Creating .env file..."
 sudo bash -c 'cat << EOF > /opt/app/.env
 DB_HOST=${DB_HOST}
 DB_USER=${DB_USER}
-DB_PASSWORD=${DB_PASS}
-DB_NAME=${DB_DATABASE}
+DB_PASS=${DB_PASS}
+DB_DATABASE=${DB_DATABASE}
 PORT=${PORT}
 EOF'
 echo ".env file created"
