@@ -24,15 +24,19 @@ echo "Creating .env file..."
 sudo bash -c 'cat << EOF > /opt/app/.env
 DB_HOST=${DB_HOST}
 DB_USER=${DB_USER}
-DB_PASSWORD=${DB_PASSWORD}
-DB_NAME=${DB_NAME}
+DB_PASSWORD=${DB_PASS}
+DB_NAME=${DB_DATABASE}
 PORT=${PORT}
 EOF'
 echo ".env file created"
 if sudo touch /opt/app/.env; then
   echo "Successfully created .env file"
 fi
-
+echo "Debug: DB_HOST=${DB_HOST}"
+echo "Debug: DB_USER=${DB_USER}"
+echo "Debug: DB_PASS=${DB_PASS}"
+echo "Debug: DB_DATABASE=${DB_DATABASE}"
+echo "Debug: PORT=${PORT}"
 echo "Setting correct permissions for .env file..."
 sudo chown csye6225:csye6225 .env
 sudo chmod 600 .env
