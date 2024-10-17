@@ -84,8 +84,8 @@ jobs:
           packer build -debug \
             -var "aws_region=${{ env.AWS_REGION }}" \
             -var "demo_account_id=${{ secrets.DEMO_ACCOUNT_ID }}" \
-            -var "MYSQL_PASSWORD=${{secrets.DB_PASS}}" \
-            -var "MYSQL_DATABASENAME=${{secrets.DB_DATABASE}}" \
-            -var "MYSQL_USERNAME=${{secrets.DB_USER}}" \
-            -var "MYSQL_HOSTNAME=${{secrets.DB_HOST}}"\
+            -var "DB_PASS=${{secrets.DB_PASS}}" \
+            -var "DB_DATABASE=${{secrets.DB_DATABASE}}" \
+            -var "DB_USER=${{secrets.DB_USER}}" \
+            -var "DB_HOST=${{secrets.DB_HOST}}"\
             -var "PORT=${{secrets.PORT}}" aws.pkr.hcl || exit 1 
