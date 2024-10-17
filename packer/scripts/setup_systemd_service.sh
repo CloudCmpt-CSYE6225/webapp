@@ -17,8 +17,6 @@ ExecStartPre=/bin/bash -c "while [ ! -f /opt/finish.txt ]; do sleep 1; done"
 ExecStart=/usr/bin/node /opt/app/index.js
 Restart=on-failure
 RestartSec=3
-StandardOutput=append:/var/log/app_output.log
-StandardError=append:/var/log/app_error.log
 
 
 [Install]
