@@ -42,3 +42,5 @@
     ```
 
 ## Packer check and packer build workflows added, running packer build workflow creates AMI
+
+testing build flow
