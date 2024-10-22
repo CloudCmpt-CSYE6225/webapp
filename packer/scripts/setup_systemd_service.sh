@@ -14,8 +14,11 @@ Group=csye6225
 EnvironmentFile=/opt/app/.env
 WorkingDirectory=/opt/app
 ExecStart=/usr/bin/node /opt/app/index.js
-Restart=on-failure
-TimeoutStartSec=60
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=webapp
 
 [Install]
 WantedBy=multi-user.target

@@ -20,25 +20,29 @@ sudo unzip -o webapp-artifact.zip -d .
 echo "Setting correct ownership..."
 sudo chown -R csye6225:csye6225 .
 
-# Check if .env file exists
-if [ ! -f .env ]; then
-    echo "Creating .env file..."
-    sudo bash -c 'cat << EOF > /opt/app/.env
-DB_HOST=${DB_HOST}
-DB_USER=${DB_USER}
-DB_PASS=${DB_PASS}
-DB_DATABASE=${DB_DATABASE}
-PORT=${PORT}
-EOF'
-    echo ".env file created"
-else
-    echo ".env file already exists, skipping creation."
-fi
+# # Check if .env file exists
+# if [ ! -f .env ]; then
+#     echo "Creating .env file..."
+#     sudo bash -c 'cat << EOF > /opt/app/.env
+# DB_HOST=${DB_HOST}
+# DB_USER=${DB_USER}
+# DB_PASS=${DB_PASS}
+# DB_DATABASE=${DB_DATABASE}
+# PORT=${PORT}
+# EOF'
+#     echo ".env file created"
+# else
+#     echo ".env file already exists, skipping creation."
+# fi
 
-echo "Setting correct permissions for .env file..."
-sudo chown csye6225:csye6225 .env
-sudo chmod 644 .env
-echo ".env file permissions set"
+# echo "Setting correct permissions for .env file..."
+# sudo chown csye6225:csye6225 .env
+# sudo chmod 600 .env
+# echo ".env file permissions set"
+
+echo "Setting correct permissions"
+sudo find /opt/app -type d -exec chmod 755 {} \;
+sudo find /opt/app -type f -exec chmod 644 {} \;
 
 echo "Installing dependencies..."
 sudo -u csye6225 npm install
