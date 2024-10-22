@@ -122,16 +122,16 @@ build {
     script       = "scripts/install_dependencies.sh"
   }
 
-  provisioner "shell" {
-    environment_vars = [
-      "DB_PASS=${var.DB_PASS}",
-      "DB_DATABASE=${var.DB_DATABASE}",
-      "DB_USER=${var.DB_USER}",
-      "DB_HOST=${var.DB_HOST}",
-      "PORT=${var.PORT}",
-    ]
-    script = "scripts/setup_mysql.sh"
-  }
+  # provisioner "shell" {
+  #   environment_vars = [
+  #     "DB_PASS=${var.DB_PASS}",
+  #     "DB_DATABASE=${var.DB_DATABASE}",
+  #     "DB_USER=${var.DB_USER}",
+  #     "DB_HOST=${var.DB_HOST}",
+  #     "PORT=${var.PORT}",
+  #   ]
+  #   script = "scripts/setup_mysql.sh"
+  # }
 
   provisioner "shell" {
     script = "scripts/create_webapp_user.sh"

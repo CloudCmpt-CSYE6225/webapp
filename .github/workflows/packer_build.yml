@@ -62,12 +62,6 @@ jobs:
 
       - name: Build application artifact
         run: |
-          touch .env
-          echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
-          echo "DB_USER=${{ secrets.DB_USER }}" >> .env
-          echo "DB_PASS=${{ secrets.DB_PASS }}" >> .env
-          echo "DB_DATABASE=${{ secrets.DB_DATABASE }}" >> .env
-          echo "PORT=${{ secrets.PORT }}" >> .env
           npm run build
 
       - name: Setup Packer
