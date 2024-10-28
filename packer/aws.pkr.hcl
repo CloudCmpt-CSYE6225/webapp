@@ -162,4 +162,13 @@ build {
   provisioner "shell" {
     script = "scripts/cleanup.sh"
   }
+
+  provisioner "shell" {
+    inline = [
+      "sudo yum update -y",
+      "sudo yum install -y amazon-cloudwatch-agent",
+      "sudo systemctl enable amazon-cloudwatch-agent",
+      "sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json"
+    ]
+  }
 }
