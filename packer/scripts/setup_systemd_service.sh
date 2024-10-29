@@ -35,3 +35,10 @@ sudo systemctl start webapp.service
 
 # Check the status
 sudo systemctl status webapp.service
+
+# Enable and start CloudWatch agent
+sudo systemctl enable amazon-cloudwatch-agent
+sudo systemctl start amazon-cloudwatch-agent
+
+# Verify CloudWatch agent status
+sudo systemctl status amazon-cloudwatch-agent
