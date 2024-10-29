@@ -3,6 +3,7 @@ import { config } from 'dotenv';
 import sequelize from './app/config/database.js';
 import healthRoutes from './app/routes/healthRoutes.js';
 import userRoutes from './app/routes/userRoutes.js';
+import imageRoutes from './app/routes/imageRoutes.js';
 
 // Load environment variables
 config();
@@ -27,6 +28,7 @@ app.use((req, res, next) => {
 // Routes
 app.use('/healthz', healthRoutes);
 app.use('/v1/user', userRoutes);
+app.use('/v1/user', imageRoutes);
 
 // Start the server
 const PORT = process.env.PORT || 8080;
