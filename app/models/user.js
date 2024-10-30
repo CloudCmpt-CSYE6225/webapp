@@ -1,11 +1,10 @@
-import { DataTypes } from 'sequelize';
-import { v4 as uuidv4 } from 'uuid';
+import sequelize from "../config/database.js";
+import { DataTypes, Sequelize } from "sequelize";
 
-const UserModel = (sequelize) => {
-  const User = sequelize.define('User', {
+const User = sequelize.define('User', {
     id: {
       type: DataTypes.UUID,
-      defaultValue: () => uuidv4(),
+      defaultValue: Sequelize.UUIDV4,
       primaryKey: true
     },
     first_name: {
@@ -30,15 +29,15 @@ const UserModel = (sequelize) => {
     },
     account_created: {
       type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW
+      defaultValue: Sequelize.NOW
     },
     account_updated: {
       type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW
+      defaultValue: Sequelize.NOW
     }
   }, {
-    timestamps: false,
-    tableName: 'users',
+    timestamps: false, 
+    // Hook to update account_updated
     hooks: {
       beforeUpdate: async (user) => {
         user.account_updated = new Date();
@@ -46,15 +45,4 @@ const UserModel = (sequelize) => {
     }
   });
 
-  // Add associations
-  User.associate = (models) => {
-    User.hasOne(models.Image, {
-      foreignKey: 'user_id',
-      onDelete: 'CASCADE'
-    });
-  };
-
-  return User;
-};
-
-export default UserModel;
+export default User;
