@@ -13,7 +13,17 @@ export const uploadImage = async (req, res) => {
       }
 
       // Validate file
-      s3Utils.validateFile(req.file);
+      try {
+        s3Utils.validateFile(req.file);
+      } catch (validationError) {
+        logger.warn('File validation failed', { 
+          error: validationError.message,
+          userId: req.user.id,
+          fileType: req.file.mimetype,
+          fileSize: req.file.size 
+        });
+        return res.status(400).json({ error: validationError.message });
+      }
 
       // Check if user already has an image
       const existingImage = await metrics.trackDbQuery('findExistingImage', async () => {
@@ -24,8 +34,10 @@ export const uploadImage = async (req, res) => {
 
       if (existingImage) {
         // Delete existing image from S3
+        const urlParts = image.url.split('/');
+        const key = urlParts[urlParts.length - 1];
         await metrics.trackS3Operation('deleteExistingImage', async () => {
-          await s3Utils.deleteFile(existingImage.url.split('/').pop(), req.user.id);
+          await s3Utils.deleteFile(key, req.user.id);
         });
 
         await metrics.trackDbQuery('deleteExistingImageRecord', async () => {
