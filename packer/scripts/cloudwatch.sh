@@ -45,7 +45,7 @@ cat > /tmp/cloudwatch-config.json << 'EOL'
       "statsd": {
         "service_address": ":8125",
         "metrics_collection_interval": 5,
-        "metrics_aggregation_interval": 60
+        "metrics_aggregation_interval": 5
       }
     },
     "append_dimensions": {

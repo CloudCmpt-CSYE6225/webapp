@@ -1,7 +1,6 @@
 import userService from '../services/userService.js';
 import { logger, metrics } from '../utils/logger.js';
 import emailService from '../utils/sendgrid.js';
-
 // Create a new user
 export const createUser = async (req, res) => {
   // Track API call count
@@ -16,47 +15,67 @@ export const createUser = async (req, res) => {
         logger.warn('Missing required fields in user creation', {
           providedFields: Object.keys(req.body)
         });
-        return res.status(400).end();
+        return res.status(400).json({ error: 'Missing required fields' });
       }
 
-      const newUser = await metrics.trackDbQuery('createUser', async () => {
-        return await userService.createUser(email, password, first_name, last_name);
-      });
+      let newUser;
+      try {
+        newUser = await metrics.trackDbQuery('createUser', async () => {
+          return await userService.createUser(email, password, first_name, last_name);
+        });
 
-      // Prepare response (exclude password)
-      const userResponse = {
-        id: newUser.id,
-        first_name: newUser.first_name,
-        last_name: newUser.last_name,
-        email: newUser.email,
-        account_created: newUser.account_created,
-        account_updated: newUser.account_updated
-      };
+        // Send welcome email
+        try {
+          await emailService.sendEmail(
+            email,
+            'Welcome to Our Service',
+            'Your account has been created successfully!'
+          );
+          logger.info('Welcome email sent', { 
+            userId: newUser.id,
+            email: newUser.email 
+          });
+        } catch (emailError) {
+          // Log email error but don't fail the request
+          logger.error('Failed to send welcome email:', { 
+            error: emailError.message,
+            userId: newUser.id,
+            email: newUser.email 
+          });
+        }
 
-      logger.info('User created successfully', {
-        userId: newUser.id,
-        email: newUser.email
-      });
+        // Prepare response (exclude password)
+        const userResponse = {
+          id: newUser.id,
+          first_name: newUser.first_name,
+          last_name: newUser.last_name,
+          email: newUser.email,
+          account_created: newUser.account_created,
+          account_updated: newUser.account_updated
+        };
 
-      res.status(201).json(userResponse);
+        logger.info('User created successfully', {
+          userId: newUser.id,
+          email: newUser.email
+        });
+
+        return res.status(201).json(userResponse);
+
+      } catch (dbError) {
+        logger.error('Database error creating user:', {
+          error: dbError.message,
+          stack: dbError.stack
+        });
+        return res.status(400).json({ error: dbError.message });
+      }
     });
   } catch (error) {
-    logger.error('Error creating user:', {
+    logger.error('Error in create user flow:', {
       error: error.message,
       stack: error.stack
     });
-    res.status(400).end();
+    res.status(400).json({ error: error.message });
   }
-
-  try {
-    await emailService.sendEmail(
-        user.email,
-        'Account Created',
-        'Your account has been created successfully!'
-    );
-} catch (error) {
-    logger.error('Failed to send email:', { error: error.message });
-}
 };
 
 // Update user information
