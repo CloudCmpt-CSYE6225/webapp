@@ -138,24 +138,14 @@ build {
   }
 
   provisioner "shell" {
-    environment_vars = [
-      "DB_PASS=${var.DB_PASS}",
-      "DB_DATABASE=${var.DB_DATABASE}",
-      "DB_USER=${var.DB_USER}",
-      "DB_HOST=${var.DB_HOST}",
-      "PORT=${var.PORT}",
-    ]
     script = "scripts/setup_application.sh"
   }
 
   provisioner "shell" {
-    environment_vars = [
-      "DB_PASS=${var.DB_PASS}",
-      "DB_DATABASE=${var.DB_DATABASE}",
-      "DB_USER=${var.DB_USER}",
-      "DB_HOST=${var.DB_HOST}",
-      "PORT=${var.PORT}",
-    ]
+    script = "scripts/cloudwatch.sh"
+  }
+
+  provisioner "shell" {
     script = "scripts/setup_systemd_service.sh"
   }
 
