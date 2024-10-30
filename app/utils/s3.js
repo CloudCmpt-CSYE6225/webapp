@@ -49,19 +49,26 @@ const s3Utils = {
   },
 
   deleteFile: async (key, userId) => {
+
+    if (!key || !userId) {
+      throw new Error('Invalid key or userId provided');
+    }
+    // Construct the proper key including user ID
+    const fullKey = `${userId}/${key}`;
+    
     const params = {
-      Bucket: process.env.S3_BUCKET,
-      Key: key
+      Bucket: process.env.S3_BUCKET, 
+      Key: fullKey
     };
 
     try {
       await metrics.trackS3Operation('delete', async () => {
         return await s3.deleteObject(params).promise();
-      }, { key, userId });
+      }, { key: fullKey, userId });
 
       logger.info('File deleted successfully from S3', {
         bucket: process.env.S3_BUCKET,
-        key,
+        key: fullKey,
         userId,
         operation: 'delete'
       });
@@ -70,7 +77,7 @@ const s3Utils = {
     } catch (error) {
       logger.error('Error deleting file from S3', {
         error: error.message,
-        key,
+        key: fullKey,
         userId,
         operation: 'delete'
       });

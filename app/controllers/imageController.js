@@ -130,10 +130,22 @@ export const deleteImage = async (req, res) => {
         return res.status(404).json({ error: 'Image not found' });
       }
 
-      // Delete from S3
-      await metrics.trackS3Operation('deleteImage', async () => {
-        await s3Utils.deleteFile(image.url.split('/').pop(), req.user.id);
-      });
+     // Extract the key properly from the URL
+     const urlParts = image.url.split('/');
+     const key = urlParts[urlParts.length - 1];
+
+     if (!key) {
+       logger.error('Invalid S3 key extracted from URL', {
+         url: image.url,
+         userId: req.user.id
+       });
+       return res.status(400).json({ error: 'Invalid image URL' });
+     }
+
+     // Delete from S3 first
+     await metrics.trackS3Operation('deleteImage', async () => {
+       await s3Utils.deleteFile(key, req.user.id);
+     });
 
       // Delete from database
       await metrics.trackDbQuery('deleteImageRecord', async () => {
@@ -142,7 +154,8 @@ export const deleteImage = async (req, res) => {
 
       logger.info('Image deleted successfully', {
         userId: req.user.id,
-        imageId: image.id
+        imageId: image.id,
+        fileName: key
       });
 
       res.status(204).end();
