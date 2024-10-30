@@ -2,16 +2,16 @@
 set -e
 set -x
 
-#adding cloudwatch configuration
+# Adding CloudWatch configuration
 echo "CloudWatch Agent downloading..."
 cd /tmp
 wget https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
 sudo dpkg -i -E ./amazon-cloudwatch-agent.deb
 
-echo "Cloudwatch agent downloaded successfully!!"
+echo "CloudWatch agent downloaded successfully!"
 
 # Configure CloudWatch Agent
-log "Configuring CloudWatch agent..."
+echo "Configuring CloudWatch agent..."
 cat > /tmp/cloudwatch-config.json << 'EOL'
 {
   "agent": {
@@ -77,8 +77,9 @@ cat > /tmp/cloudwatch-config.json << 'EOL'
 EOL
 
 # Move config and start agent
-log "Moving CloudWatch config and starting agent..."
+echo "Moving CloudWatch config and starting agent..."
 sudo mv /tmp/cloudwatch-config.json /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
 sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
 
-rm -f amazon-cloudwatch-agent.deb
+# Cleanup
+rm -f /tmp/amazon-cloudwatch-agent.deb
