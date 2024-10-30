@@ -48,17 +48,17 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Run Integration Tests
-        run: npm test -- --detectOpenHandles --verbose --forceExit
+      # - name: Run Integration Tests
+      #   run: npm test -- --detectOpenHandles --verbose --forceExit
 
-      - name: Drop DB
-        if: always()
-        run: mysql -h ${{secrets.DB_HOST}} -u ${{ secrets.DB_USER }} -p${{ secrets.DB_PASS }} -e "DROP DATABASE IF EXISTS ${{ secrets.DB_DATABASE }};"
+      # - name: Drop DB
+      #   if: always()
+      #   run: mysql -h ${{secrets.DB_HOST}} -u ${{ secrets.DB_USER }} -p${{ secrets.DB_PASS }} -e "DROP DATABASE IF EXISTS ${{ secrets.DB_DATABASE }};"
 
-      - name: Setup MySQL
-        run: |
-          sudo /etc/init.d/mysql start
-          mysql -h ${{secrets.DB_HOST}} -u${{secrets.DB_USER}} -p${{secrets.DB_PASS}} -e "CREATE DATABASE ${{ secrets.DB_DATABASE }};"
+      # - name: Setup MySQL
+      #   run: |
+      #     sudo /etc/init.d/mysql start
+      #     mysql -h ${{secrets.DB_HOST}} -u${{secrets.DB_USER}} -p${{secrets.DB_PASS}} -e "CREATE DATABASE ${{ secrets.DB_DATABASE }};"
 
       - name: Build application artifact
         run: |

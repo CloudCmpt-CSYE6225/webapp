@@ -20,8 +20,8 @@ export const logger = createLogger({
     new _transports.Console(),
     new WinstonCloudWatch({
       logGroupName: '/webapp/logs',
-      logStreamName: `${process.env.NODE_ENV}-${new Date().toISOString().split('T')[0]}`,
-      awsRegion: process.env.AWS_REGION
+      logStreamName: `${process.env.NODE_ENV || 'logs'}-${new Date().toISOString().split('T')[0]}`,
+      awsRegion: process.env.AWS_REGION || 'us-east-1', // Add this line
     })
   ]
 });

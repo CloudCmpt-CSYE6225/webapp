@@ -42,5 +42,29 @@ User.hasOne(Image, {
     onDelete: 'CASCADE'
 });
 
+// Sync database
+const initDatabase = async () => {
+  try {
+      await sequelize.authenticate();
+      console.log('Database connection established');
+
+      // Drop all tables if they exist and recreate
+      await sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
+      await sequelize.sync({ force: true }); // This will drop and recreate tables
+      await sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
+
+      console.log('Database synchronized');
+  } catch (error) {
+      console.error('Database initialization error:', error);
+      throw error;
+  }
+};
+
+// Initialize database
+initDatabase().catch(error => {
+  console.error('Failed to initialize database:', error);
+  process.exit(1);
+});
+
 export { User, Image };
 export default sequelize;
