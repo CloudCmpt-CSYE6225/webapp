@@ -42,19 +42,5 @@ User.hasOne(Image, {
     onDelete: 'CASCADE'
 });
 
-// Test database connection
-const testConnection = async () => {
-    try {
-        await sequelize.authenticate();
-        console.log('Database connection established successfully.');
-        await sequelize.sync();
-        console.log('Database synchronized successfully.');
-    } catch (error) {
-        console.error('Unable to connect to the database:', error);
-    }
-};
-
-testConnection();
-
 export { User, Image };
 export default sequelize;
