@@ -1,5 +1,6 @@
 import userService from '../services/userService.js';
 import { logger, metrics } from '../utils/logger.js';
+import emailService from '../utils/sendgrid.js';
 
 // Create a new user
 export const createUser = async (req, res) => {
@@ -46,6 +47,16 @@ export const createUser = async (req, res) => {
     });
     res.status(400).end();
   }
+
+  try {
+    await emailService.sendEmail(
+        user.email,
+        'Account Created',
+        'Your account has been created successfully!'
+    );
+} catch (error) {
+    logger.error('Failed to send email:', { error: error.message });
+}
 };
 
 // Update user information
