@@ -1,6 +1,6 @@
 import { logger, metrics } from '../utils/logger.js';
 import s3Utils from '../utils/s3.js';
-import Image from '../models/image.js';
+import { User, Image } from '../models/index.js';
 
 export const uploadImage = async (req, res) => {
   // Track API call count
