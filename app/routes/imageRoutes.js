@@ -9,7 +9,7 @@ const router = express.Router();
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB limit (reduced from 10MB)
+    fileSize: 5 * 1024 * 1024 // 5MB limit
   },
   fileFilter: (req, file, cb) => {
     const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png'];
@@ -17,10 +17,10 @@ const upload = multer({
     if (allowedMimeTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Invalid file type. Only PNG, JPG, and JPEG files are allowed.'));
+      cb(new Error('Invalid file type. Only PNG, JPG, and JPEG files are allowed.'), false);
     }
   }
-});
+}).single('file');
 
 // Add headers middleware
 const addHeaders = (req, res, next) => {
@@ -30,6 +30,25 @@ const addHeaders = (req, res, next) => {
     'X-Content-Type-Options': 'nosniff'
   });
   next();
+};
+
+// Multer error handling middleware
+const handleMulterError = (req, res, next) => {
+  upload(req, res, (err) => {
+    if (err instanceof multer.MulterError) {
+      // Multer-specific errors (e.g., file size exceeded)
+      return res.status(400).json({
+        error: err.message
+      });
+    } else if (err) {
+      // Other errors (e.g., file type validation)
+      return res.status(400).json({
+        error: err.message
+      });
+    }
+    // If no error, proceed to next middleware
+    next();
+  });
 };
 
 // Handle unsupported methods
@@ -44,7 +63,7 @@ router.all('/self/pic', addHeaders, (req, res, next) => {
 });
 
 // Image endpoints with authentication and headers
-router.post('/self/pic', addHeaders, authMiddleware, upload.single('file'), uploadImage);
+router.post('/self/pic', addHeaders, authMiddleware, handleMulterError, uploadImage);
 router.get('/self/pic', addHeaders, authMiddleware, getImage);
 router.delete('/self/pic', addHeaders, authMiddleware, deleteImage);
 
