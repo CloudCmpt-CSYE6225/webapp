@@ -13,6 +13,7 @@ jobs:
 
     env:
       AWS_REGION: us-east-1
+      NODE_ENV: test
       DB_USER: ${{ secrets.DB_USER }}
       DB_PASS: ${{ secrets.DB_PASS }}
       DB_HOST: ${{ secrets.DB_HOST }}
@@ -80,6 +81,7 @@ jobs:
             -var "aws_region=${{ env.AWS_REGION }}" \
             -var "demo_account_id=${{ secrets.DEMO_ACCOUNT_ID }}" \
             -var "DB_PASS=${{secrets.DB_PASS}}" \
+            -var "NODE_ENV"= ${{env.NODE_ENV}} \
             -var "DB_DATABASE=${{secrets.DB_DATABASE}}" \
             -var "DB_USER=${{secrets.DB_USER}}" \
             -var "DB_HOST=${{secrets.DB_HOST}}"\
