@@ -2,6 +2,7 @@ import { Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
 import User from './user.js';
 import ImageModel from './image.js';
+import EmailTracking from './email.js';
 
 dotenv.config();
 
@@ -30,6 +31,7 @@ db.Sequelize = Sequelize;
 
 // Initialize models with sequelize instance 
 const Image = ImageModel(sequelize);
+const Email = new EmailTracking(sequelize); 
 
 // Set up associations
 Image.belongsTo(User, {
