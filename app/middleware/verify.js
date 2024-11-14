@@ -71,7 +71,7 @@ export const blockUnverifiedUsers = async (req, res, next) => {
         const { email } = req.body; // Assuming email is passed in request body
 
         if (!email) {
-            return res.status(400).json({ message: 'Email is required' });
+            return res.status(400).json({ message: 'Email not verified and not found' });
         }
 
         // Connect to the database
