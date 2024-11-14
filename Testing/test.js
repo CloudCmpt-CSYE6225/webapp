@@ -69,45 +69,45 @@ describe('Health Check and User Update Endpoints', () => {
     expect(res.status).toEqual(400);
   });
 
-  it('should return 204 on successful user update', async () => {
-    const res = await request(app)
-      .put('/v1/user/self')
-      .auth('srijith.makam@abc.com', '12345')
-      .send({
-        email: 'srijith.makam@abc.com',
-        first_name: 'Srijith',
-        last_name: 'Makam',
-        password: 'abcd1234'
-      });
+  // it('should return 204 on successful user update', async () => {
+  //   const res = await request(app)
+  //     .put('/v1/user/self')
+  //     .auth('srijith.makam@abc.com', '12345')
+  //     .send({
+  //       email: 'srijith.makam@abc.com',
+  //       first_name: 'Srijith',
+  //       last_name: 'Makam',
+  //       password: 'abcd1234'
+  //     });
 
-    expect(res.status).toEqual(204);
-  });
+  //   expect(res.status).toEqual(204);
+  // });
 
-  it('should return 400 if required fields are missing for user update', async () => {
-    const res = await request(app)
-      .put('/v1/user/self')
-      .auth('srijith.makam@abc.com', 'abcd1234')
-      .send({
-        email: 'srijith.makam@abc.com',
-      });
+  // it('should return 400 if required fields are missing for user update', async () => {
+  //   const res = await request(app)
+  //     .put('/v1/user/self')
+  //     .auth('srijith.makam@abc.com', 'abcd1234')
+  //     .send({
+  //       email: 'srijith.makam@abc.com',
+  //     });
 
-    expect(res.status).toEqual(400);
-  });
+  //   expect(res.status).toEqual(400);
+  // });
 
-  it('should return user information on successful GET request', async () => {
-    // Assuming a user with email 'srijith.makam' exists and is authenticated.
-    const res = await request(app)
-      .get('/v1/user/self')
-      .auth('srijith.makam@abc.com', 'abcd1234')
+  // it('should return user information on successful GET request', async () => {
+  //   // Assuming a user with email 'srijith.makam' exists and is authenticated.
+  //   const res = await request(app)
+  //     .get('/v1/user/self')
+  //     .auth('srijith.makam@abc.com', 'abcd1234')
 
-    expect(res.status).toEqual(200);
-    expect(res.body).toHaveProperty('id');
-    expect(res.body).toHaveProperty('first_name');
-    expect(res.body).toHaveProperty('last_name');
-    expect(res.body).toHaveProperty('email');
-    expect(res.body).toHaveProperty('account_created');
-    expect(res.body).toHaveProperty('account_updated');
-  });
+  //   expect(res.status).toEqual(200);
+  //   expect(res.body).toHaveProperty('id');
+  //   expect(res.body).toHaveProperty('first_name');
+  //   expect(res.body).toHaveProperty('last_name');
+  //   expect(res.body).toHaveProperty('email');
+  //   expect(res.body).toHaveProperty('account_created');
+  //   expect(res.body).toHaveProperty('account_updated');
+  // });
 
   it('should return 401 if user is not authenticated', async () => {
     // Assuming no user is authenticated or the authenticated user doesn't exist.

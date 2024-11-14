@@ -34,6 +34,10 @@ const User = sequelize.define('User', {
     account_updated: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
+    },
+    is_verified: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     }
   }, {
     timestamps: false, 

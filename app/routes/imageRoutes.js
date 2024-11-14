@@ -2,6 +2,7 @@ import express from 'express';
 import { uploadImage, getImage, deleteImage } from '../controllers/imageController.js';
 import authMiddleware from '../middleware/auth.js';
 import multer from 'multer';
+import { blockUnverifiedUsers } from '../middleware/verify.js';
 
 const router = express.Router();
 
@@ -63,8 +64,8 @@ router.all('/self/pic', addHeaders, (req, res, next) => {
 });
 
 // Image endpoints with authentication and headers
-router.post('/self/pic', addHeaders, authMiddleware, handleMulterError, uploadImage);
-router.get('/self/pic', addHeaders, authMiddleware, getImage);
-router.delete('/self/pic', addHeaders, authMiddleware, deleteImage);
+router.post('/self/pic', addHeaders, authMiddleware, handleMulterError, blockUnverifiedUsers, uploadImage);
+router.get('/self/pic', addHeaders, authMiddleware, blockUnverifiedUsers, getImage);
+router.delete('/self/pic', addHeaders, authMiddleware, blockUnverifiedUsers, deleteImage);
 
 export default router;
