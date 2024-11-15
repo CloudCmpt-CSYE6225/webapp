@@ -53,12 +53,10 @@ export const verifyUser = async (req, res, next) => {
 // Middleware to block unverified users from accessing other API routes
 export const blockUnverifiedUsers = async (req, res, next) => {
     try {
-        const { email } = req.body; // Assuming email is passed in request body
-
-        // Check if email is provided
-        if (!email) {
-            return res.status(400).json({ message: 'Email not provided' });
-        }
+        
+        const authHeader = req.headers.authorization;
+        const token = authHeader.split(' ')[1];
+        const [email, password] = Buffer.from(token, 'base64').toString().split(':');
 
         // Find user by email using Sequelize
         const user = await User.findOne({ where: { email } });
