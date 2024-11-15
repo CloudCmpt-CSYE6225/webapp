@@ -1,16 +1,9 @@
-import { createConnection } from 'mysql2/promise';
-
-// RDS configuration
-const rdsConfig = {
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: process.env.DB_DATABASE,
-};
+import User from '../models/user.js'; 
 
 // Middleware to verify user by clicking the link
 export const verifyUser = async (req, res, next) => {
-    if (process.env.NODE_ENV === "test") return next();
+    if (process.env.NODE_ENV === "test") return next(); // Skip verification in test environment
+
     try {
         const { email, expires } = req.query;
 
@@ -19,49 +12,41 @@ export const verifyUser = async (req, res, next) => {
             return res.status(400).json({ message: 'Invalid verification link' });
         }
 
+        // Check if expires is a valid date
+        const expirationTime = new Date(expires);
+        if (isNaN(expirationTime.getTime())) {
+            return res.status(400).json({ message: 'Invalid expiration date' });
+        }
+
         // Check if the verification link has expired
         const currentTime = new Date();
-        const expirationTime = new Date(expires);
-
         if (currentTime > expirationTime) {
             return res.status(400).json({ message: 'Verification link has expired' });
         }
 
-        // Connect to the database
-        const connection = await createConnection(rdsConfig);
+        // Find user by email using Sequelize
+        const user = await User.findOne({ where: { email } });
 
-        // Check if the user exists and is already verified
-        const [rows] = await connection.execute(
-            'SELECT is_verified FROM users WHERE email = ?',
-            [email]
-        );
-
-        if (rows.length === 0) {
-            await connection.end();
+        if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        const user = rows[0];
-
         // If the user is already verified, no need to re-verify
         if (user.is_verified) {
-            await connection.end();
             return res.status(200).json({ message: 'User already verified' });
         }
 
         // Mark the user as verified in the database
-        await connection.execute(
-            'UPDATE users SET is_verified = 1 WHERE email = ?',
-            [email]
-        );
-
-        await connection.end();
+        user.is_verified = true;
+        await user.save(); // Save the updated user record
 
         return res.status(200).json({ message: 'Email successfully verified' });
 
     } catch (error) {
         console.error('Error verifying user:', error);
-        return res.status(500).json({ message: 'Internal server error' });
+        
+        // Return a 500 status code for server-side errors
+        return res.status(500).json({ message: 'Could not verify user due to server error' });
     }
 };
 
@@ -70,39 +55,30 @@ export const blockUnverifiedUsers = async (req, res, next) => {
     try {
         const { email } = req.body; // Assuming email is passed in request body
 
+        // Check if email is provided
         if (!email) {
-            return res.status(400).json({ message: 'Email not verified and not found' });
+            return res.status(400).json({ message: 'Email not provided' });
         }
 
-        // Connect to the database
-        const connection = await createConnection(rdsConfig);
+        // Find user by email using Sequelize
+        const user = await User.findOne({ where: { email } });
 
-        // Check if the user exists and is verified
-        const [rows] = await connection.execute(
-            'SELECT is_verified FROM users WHERE email = ?',
-            [email]
-        );
-
-        if (rows.length === 0) {
-            await connection.end();
+        if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        const user = rows[0];
-
         // If the user is not verified, block access
         if (!user.is_verified) {
-            await connection.end();
             return res.status(403).json({ message: 'Account not verified. Please verify your email.' });
         }
-
-        await connection.end();
 
         // Proceed to the next middleware or route handler if verified
         next();
 
     } catch (error) {
         console.error('Error checking verification status:', error);
-        return res.status(500).json({ message: 'Internal server error' });
+        
+        // Return a 500 status code for server-side errors
+        return res.status(500).json({ message: 'Error checking verification status due to server error' });
     }
 };
