@@ -30,18 +30,13 @@ export const verifyUser = async (req, res, next) => {
 
         // Check if verification record exists and token matches
         if (!emailVerificationRecord || emailVerificationRecord.token !== token) {
-            return res.status(400).json({ message: 'Invalid or expired verification link' });
+            return res.status(400).json({ message: 'Invalid verification link' });
         }
 
         // Calculate expiration time (2 minutes after created_at)
         const expirationTime = new Date(emailVerificationRecord.created_at);
-        expirationTime.setMinutes(expirationTime.getMinutes() + 2); // Add 2 minutes
-
-        // Check if expires is a valid date
-        if (isNaN(expirationTime.getTime())) {
-            return res.status(400).json({ message: 'Invalid expiration date' });
-        }
-
+        expirationTime.setMinutes(expirationTime.getMinutes() + 2); // Add 2 minute
+        
         // Get current time and check if verification link has expired
         const currentTime = new Date(); 
         if (currentTime > expirationTime) {
