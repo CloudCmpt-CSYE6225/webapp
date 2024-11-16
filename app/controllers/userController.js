@@ -57,6 +57,7 @@ export const createUser = async (req, res) => {
             first_name: newUser.first_name,
             last_name: newUser.last_name,
             account_created: newUser.account_created,
+            token: UUIDV4()
           };
 
           const params = {

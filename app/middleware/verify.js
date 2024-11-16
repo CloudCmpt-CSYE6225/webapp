@@ -1,27 +1,16 @@
 import User from '../models/user.js'; 
+import email_tracking from '../models/email.js';
 
 // Middleware to verify user by clicking the link
 export const verifyUser = async (req, res, next) => {
     if (process.env.NODE_ENV === "test") return next(); // Skip verification in test environment
 
     try {
-        const { email, expires } = req.query;
+        const { email, token } = req.query;
 
         // Check if required query parameters are present
-        if (!email || !expires) {
+        if (!email || !token) {
             return res.status(400).json({ message: 'Invalid verification link' });
-        }
-
-        // Check if expires is a valid date
-        const expirationTime = new Date(expires);
-        if (isNaN(expirationTime.getTime())) {
-            return res.status(400).json({ message: 'Invalid expiration date' });
-        }
-
-        // Check if the verification link has expired
-        const currentTime = new Date();
-        if (currentTime > expirationTime) {
-            return res.status(400).json({ message: 'Verification link has expired' });
         }
 
         // Find user by email using Sequelize
@@ -34,6 +23,19 @@ export const verifyUser = async (req, res, next) => {
         // If the user is already verified, no need to re-verify
         if (user.is_verified) {
             return res.status(200).json({ message: 'User already verified' });
+        }
+
+        // Check if expires is a valid date
+        const emailVerifificationTime = await email_tracking.findOne({ where: { email } });
+        const expirationTime = new Date(emailVerifificationTime.created_at);
+        if (isNaN(expirationTime.getTime())) {
+            return res.status(400).json({ message: 'Invalid expiration date' });
+        }
+
+        // Check if the verification link has expired
+        const currentTime = new Date().toISOString;
+        if (currentTime > expirationTime) {
+            return res.status(400).json({ message: 'Verification link has expired' });
         }
 
         // Mark the user as verified in the database
@@ -53,12 +55,10 @@ export const verifyUser = async (req, res, next) => {
 // Middleware to block unverified users from accessing other API routes
 export const blockUnverifiedUsers = async (req, res, next) => {
     try {
-        const { email } = req.body; // Assuming email is passed in request body
-
-        // Check if email is provided
-        if (!email) {
-            return res.status(400).json({ message: 'Email not provided' });
-        }
+        
+        const authHeader = req.headers.authorization;
+        const token = authHeader.split(' ')[1];
+        const [email, password] = Buffer.from(token, 'base64').toString().split(':');
 
         // Find user by email using Sequelize
         const user = await User.findOne({ where: { email } });

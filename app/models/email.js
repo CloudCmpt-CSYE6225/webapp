@@ -21,10 +21,15 @@ const EmailTracking = sequelize.define('EmailTracking', {
         allowNull: false
     },
     user_id: {
-        type: DataTypes.UUID,
+        type: DataTypes.STRING,
         allowNull: false,
         unique: true
     },
+    token: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true
+    }
 }, {
     tableName: 'email_tracking',
     timestamps: true,

@@ -18,6 +18,10 @@ jobs:
       DB_HOST: ${{ secrets.DB_HOST }}
       DB_DATABASE: ${{ secrets.DB_DATABASE }}
       PORT: ${{ secrets.PORT }}
+      AWS_ACCESS_KEY_ID_DEV: ${{ secrets.AWS_ACCESS_KEY_ID_DEV }}
+      AWS_SECRET_ACCESS_KEY_DEV: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}
+      AWS_ACCESS_KEY_ID_DEMO: ${{ secrets.AWS_ACCESS_KEY_ID_DEMO }}
+      AWS_SECRET_ACCESS_KEY_DEMO: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEMO }}
 
     strategy:
       matrix:
