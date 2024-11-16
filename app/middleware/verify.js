@@ -25,15 +25,25 @@ export const verifyUser = async (req, res, next) => {
             return res.status(200).json({ message: 'User already verified' });
         }
 
+        // Fetch email verification record from email_tracking table
+        const emailVerificationRecord = await email_tracking.findOne({ where: { email } });
+
+        // Check if verification record exists and token matches
+        if (!emailVerificationRecord || emailVerificationRecord.token !== token) {
+            return res.status(400).json({ message: 'Invalid or expired verification link' });
+        }
+
+        // Calculate expiration time (2 minutes after created_at)
+        const expirationTime = new Date(emailVerificationRecord.created_at);
+        expirationTime.setMinutes(expirationTime.getMinutes() + 2); // Add 2 minutes
+
         // Check if expires is a valid date
-        const emailVerifificationTime = await email_tracking.findOne({ where: { email } });
-        const expirationTime = new Date(emailVerifificationTime.created_at);
         if (isNaN(expirationTime.getTime())) {
             return res.status(400).json({ message: 'Invalid expiration date' });
         }
 
-        // Check if the verification link has expired
-        const currentTime = new Date().toISOString;
+        // Get current time and check if verification link has expired
+        const currentTime = new Date(); 
         if (currentTime > expirationTime) {
             return res.status(400).json({ message: 'Verification link has expired' });
         }
@@ -48,7 +58,7 @@ export const verifyUser = async (req, res, next) => {
         console.error('Error verifying user:', error);
         
         // Return a 500 status code for server-side errors
-        return res.status(500).json({ message: 'Could not verify user due to server error' });
+        return res.status(500).json({ message: 'Could not verify user due to error' });
     }
 };
 
@@ -79,6 +89,6 @@ export const blockUnverifiedUsers = async (req, res, next) => {
         console.error('Error checking verification status:', error);
         
         // Return a 500 status code for server-side errors
-        return res.status(500).json({ message: 'Error checking verification status due to server error' });
+        return res.status(500).json({ message: 'Error checking verification status' });
     }
 };
