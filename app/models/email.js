@@ -3,7 +3,7 @@ import sequelize from '../config/database.js';
 
 const EmailTracking = sequelize.define('EmailTracking', {
     id: {
-        type: DataTypes.UUID,
+        type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true
     },
