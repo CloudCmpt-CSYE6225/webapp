@@ -3,7 +3,7 @@ import sequelize from '../config/database.js';
 
 const EmailTracking = sequelize.define('EmailTracking', {
     id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.UUID,
         autoIncrement: true,
         primaryKey: true
     },
@@ -21,10 +21,15 @@ const EmailTracking = sequelize.define('EmailTracking', {
         allowNull: false
     },
     user_id: {
-        type: DataTypes.UUID,
+        type: DataTypes.STRING,
         allowNull: false,
         unique: true
     },
+    token: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true
+    }
 }, {
     tableName: 'email_tracking',
     timestamps: true,
