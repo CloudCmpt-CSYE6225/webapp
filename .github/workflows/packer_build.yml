@@ -10,18 +10,16 @@ jobs:
     name: Packer Build
     runs-on: ubuntu-latest
     environment: test
+    outputs:
+      ami_id: ${{ steps.build.outputs.ami_id }}
 
     env:
-      AWS_REGION: us-east-1
+      AWS_REGION: ${{ vars.AWS_REGION }}
       DB_USER: ${{ secrets.DB_USER }}
       DB_PASS: ${{ secrets.DB_PASS }}
       DB_HOST: ${{ secrets.DB_HOST }}
       DB_DATABASE: ${{ secrets.DB_DATABASE }}
       PORT: ${{ secrets.PORT }}
-      AWS_ACCESS_KEY_ID_DEV: ${{ secrets.AWS_ACCESS_KEY_ID_DEV }}
-      AWS_SECRET_ACCESS_KEY_DEV: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}
-      AWS_ACCESS_KEY_ID_DEMO: ${{ secrets.AWS_ACCESS_KEY_ID_DEMO }}
-      AWS_SECRET_ACCESS_KEY_DEMO: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEMO }}
 
     strategy:
       matrix:
@@ -77,14 +75,71 @@ jobs:
         run: chmod +x packer/scripts/*.sh
   
       - name: Build custom AMI
+        id: build
         run: |
           cd packer
           packer init .
-          packer build -debug \
+          AMI_ID=$(packer build -machine-readable \
             -var "aws_region=${{ env.AWS_REGION }}" \
             -var "demo_account_id=${{ secrets.DEMO_ACCOUNT_ID }}" \
-            -var "DB_PASS=${{secrets.DB_PASS}}" \
-            -var "DB_DATABASE=${{secrets.DB_DATABASE}}" \
-            -var "DB_USER=${{secrets.DB_USER}}" \
-            -var "DB_HOST=${{secrets.DB_HOST}}"\
-            -var "PORT=${{secrets.PORT}}" aws.pkr.hcl || exit 1 
+            -var "DB_PASS=${{ env.DB_PASS }}" \
+            -var "DB_DATABASE=${{ env.DB_DATABASE }}" \
+            -var "DB_USER=${{ env.DB_USER }}" \
+            -var "DB_HOST=${{ env.DB_HOST }}" \
+            -var "PORT=${{ env.PORT }}" aws.pkr.hcl | awk -F, '$0 ~/artifact,0,id/ {print $6}')
+            
+          echo "AMI_ID=$AMI_ID" >> $GITHUB_ENV  # Save AMI ID to environment variable for later steps
+          echo "ami_id=$AMI_ID" >> $GITHUB_OUTPUT  # Set output for future jobs
+
+  #2nd job for running packer build 
+  autoscaling_refresh:
+    needs: packer-build
+    runs-on: ubuntu-latest
+    name: Auto scaling group launch template & instance refresh
+    
+    steps: 
+      - name: Step 1 - Configure AWS Credentials for Dev
+        if: ${{ vars.DEPLOY_ENVIRONMENT == 'dev' }}
+        uses: aws-actions/configure-aws-credentials@v4.0.2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_DEV }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Step 1 - Configure AWS Credentials for Demo
+        if: ${{ vars.DEPLOY_ENVIRONMENT == 'demo' }}
+        uses: aws-actions/configure-aws-credentials@v4.0.2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_DEMO }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEMO }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Step 2 - Run `Configuring the launch template` 
+        id: configuring
+        run: |
+          aws --version
+          LAUNCH_TEMPLATE_ID=$(aws ec2 describe-launch-templates --launch-template-names "csye6225_asg" --query "LaunchTemplates[0].LaunchTemplateId" --output text)
+          echo "LAUNCH_TEMPLATE_ID=$LAUNCH_TEMPLATE_ID" >> $GITHUB_ENV
+          aws ec2 create-launch-template-version --launch-template-data '{"ImageId":"${{ needs.packer-build.outputs.ami_id }}"}' --source-version 1 --launch-template-id $LAUNCH_TEMPLATE_ID  --no-cli-pager
+
+      - name: Step 3 - Run `Instance Refresh with latest AMI id` 
+        id: refreshing
+        run: "aws autoscaling start-instance-refresh --auto-scaling-group-name ${{ vars.AUTO_SCALING_GROUP_NAME }}"  
+
+      - name: Step 4 - Wait for Instance Refresh to Complete
+        id: wait_for_refresh
+        run: |
+          REFRESH_ID=$(aws autoscaling describe-instance-refreshes --auto-scaling-group-name ${{ vars.AUTO_SCALING_GROUP_NAME }} --query "InstanceRefreshes[0].InstanceRefreshId" --output text)
+          STATUS="InProgress"
+          while [ "$STATUS" == "InProgress" ] || [ "$STATUS" == "Pending" ]; do
+            echo "Waiting for instance refresh to complete..."
+            sleep 30  # Wait for 30 seconds before checking again
+            STATUS=$(aws autoscaling describe-instance-refreshes --auto-scaling-group-name ${{ vars.AUTO_SCALING_GROUP_NAME }} --instance-refresh-ids $REFRESH_ID --query "InstanceRefreshes[0].Status" --output text)
+            echo "Current status: $STATUS"
+          done
+          if [ "$STATUS" != "Successful" ]; then
+            echo "Instance refresh failed with status: $STATUS"
+            exit 1
+          fi
+          echo "Instance refresh completed successfully!"
+          
