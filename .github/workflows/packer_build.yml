@@ -120,7 +120,9 @@ jobs:
           aws --version
           LAUNCH_TEMPLATE_ID=$(aws ec2 describe-launch-templates --launch-template-names "csye6225_asg" --query "LaunchTemplates[0].LaunchTemplateId" --output text)
           echo "LAUNCH_TEMPLATE_ID=$LAUNCH_TEMPLATE_ID" >> $GITHUB_ENV
-          aws ec2 create-launch-template-version --launch-template-data '{"ImageId":"${{ needs.packer-build.outputs.ami_id }}"}' --source-version 1 --launch-template-id $LAUNCH_TEMPLATE_ID  --no-cli-pager
+          AMI_ID=${{ needs.packer-build.outputs.ami_id }}
+          CLEAN_AMI_ID=$(echo "$AMI_ID" | sed 's/^.*ami-/ami-/')
+          aws ec2 create-launch-template-version --launch-template-data "{\"ImageId\":\"$CLEAN_AMI_ID\"}" --source-version 1 --launch-template-id $LAUNCH_TEMPLATE_ID --no-cli-pager
 
       - name: Step 3 - Run `Instance Refresh with latest AMI id` 
         id: refreshing
