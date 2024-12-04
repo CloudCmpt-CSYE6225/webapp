@@ -29,7 +29,7 @@ app.use((req, res, next) => {
 app.use('/healthz', healthRoutes);
 app.use('/v1/user', userRoutes);
 app.use('/v1/user', imageRoutes);
-
+app.use('/cicd', healthRoutes);
 // Start the server
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
